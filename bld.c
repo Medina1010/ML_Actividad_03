@@ -3,12 +3,6 @@
 
 int main(int argc, char** argv) {
   rebuild(argc, argv);
-  /*
-  cmd("gcc $(gsl-config --cflags) $(gsl-config --libs) "
-      "src/main.c "
-      "-o src/main");
-  cmd("src/main");
-  */
-  cmd("python main.py");
+  cmd("cd src && ./bld");
   return 0;
 }
