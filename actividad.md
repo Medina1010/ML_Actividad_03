@@ -16,36 +16,37 @@ $$
 y aplicarle un analisis de componentes principales a la distribucion de punto final.
 - Aplicarle el analisis de componentes principales a los datos en el archivo sol_objects.csv
 - Construya un mapa mental del tema
+
 ```mermaid
 mindmap
-  root((Álgebra Lineal: SVD y PCA))
-    SVD - Descomposición en Valores Singulares
-      Estructura Matemática A = U S V^T
+  root((Algebra Lineal: SVD y PCA))
+    SVD - Descomposicion en Valores Singulares
+      Estructura Matematica A = U S V^T
         U y V: Matrices Ortogonales
-        S: Valores Singulares S_1 >= S_2 >= ... >= S_N >= 0
-      Propiedades Teóricas
-        Rango de la Matriz: Cantidad de valores singulares no nulos
-        Número de Condición: Razón entre el mayor y menor valor singular
-      Algoritmos Numéricos de Cálculo
+        S: Valores Singulares Mayores o Iguales a Cero
+      Propiedades Teoricas
+        Rango de la Matriz: Cantidad de valores no nulos
+        Numero de Condicion: Razon entre mayor y menor valor
+      Algoritmos Numericos de Calculo
         Golub-Reinsch General
-        Golub-Reinsch Modificado para M >> N
-        Ortogonalización Unilateral de Jacobi
-    Teoría de Compresión e Información
-      Ponderación de Energía
-        Suma Total D = sum(d_i)
-        Ponderado Individual p_i = d_i / D
-      Criterio del 95% de Información
-        Suma Acumulada P_N = sum_N(p_i) = 0.95
-      Aproximación de Rango Bajo
-        Matriz Truncada con N Términos Principales
-      Análisis Espectral
-        Comportamiento y Decaimiento Lineal, Algebraico o Exponencial
-    PCA - Análisis de Componentes Principales
-      Reducción de Dimensionalidad
-        Maximización de la Varianza Explicada
+        Golub-Reinsch Modificado
+        Ortogonalizacion Unilateral de Jacobi
+    Teoria de Compresion e Informacion
+      Ponderacion de Energia
+        Suma Total D
+        Ponderado Individual pi = di / D
+      Criterio del 95 por ciento de Informacion
+        Suma Acumulada PN = 0.95
+      Aproximacion de Rango Bajo
+        Matriz Truncada con N Terminos Principales
+      Analisis Espectral
+        Comportamiento y Decaimiento Lineal o Exponencial
+    PCA - Analisis de Componentes Principales
+      Reduccion de Dimensionalidad
+        Maximizacion de la Varianza Explicada
       Transformaciones y Proyecciones
         Distribuciones Gaussianas 2D centradas en cero
-        Transformación mediante Matrices de Proyección
-      Análisis de Datos
-        Aplicación a Tablas de Atributos (sol_objects.ods)
+        Transformacion mediante Matrices de Proyeccion
+      Analisis de Datos
+        Aplicacion a Tablas de Atributos
 ```
