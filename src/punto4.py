@@ -1,35 +1,35 @@
 import numpy as np
 
-N = 1000
-sigma_x = 2
-sigma_y = 1
+sigma_x = 1
+sigma_y = 2
+N = 100
 
 x = np.random.normal(0, sigma_x, N)
 y = np.random.normal(0, sigma_y, N)
 
-datos = np.column_stack((x, y))
+matrix = np.column_stack((x, y))
 
-A = np.array([[1,2],
-                            [-1,0]])
+T = np.array([[1, 2],
+              [-1, 0]])
 
-datos_transformados = datos @ A.T
+new_matrix = matrix @ T.T
 
-cov = np.cov(datos_transformados.T)
+data_centered = new_matrix - np.mean(new_matrix, axis=0)
 
-valores, vectores = np.linalg.eig(cov)
+cov_matrix = np.cov(data_centered, rowvar=False)
 
-idx = np.argsort(valores)[::-1]
+eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
 
-valores = valores[idx]
-vectores = vectores[:, idx]
+sort_indices = np.argsort(eigenvalues)[::-1]
+eigenvalues = eigenvalues[sort_indices]
+eigenvectors = eigenvectors[:, sort_indices]
 
-datos_pca = datos_transformados @ vectores
+explained_variance_ratio = eigenvalues / np.sum(eigenvalues)
 
-print("Covarianza:")
-print(cov)
 
-print("\nAutovalores:")
-print(valores)
+pca_projection = np.dot(data_centered, eigenvectors)
 
-print("\nAutovectores:")
-print(vectores)
+print("Matriz de Covarianza:\n", cov_matrix)
+print("\nAutovalores (Varianza explicada por cada CP):\n", eigenvalues)
+print("\nAutovectores (Direcciones de las Componentes Principales):\n", eigenvectors)
+print("\nProporción de Varianza Explicada:\n", explained_variance_ratio)
