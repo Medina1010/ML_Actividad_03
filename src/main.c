@@ -17,7 +17,16 @@ int main(void) {
   //svd_svc_image("../res/Image_03.png", "../res/Image_03_feo.png", 1);
   //svd_svc_image("../res/Image_04.png", "../res/Image_04_feo.png", 1);
   //svd_svc_image("../res/Image_05.png", "../res/Image_05_feo.png", 1);
-  svd_svc_image("../res/Image_06.png", "../res/Image_06_feo.png", 1);
+  //svd_svc_image("../res/Image_06.png", "../res/Image_06_feo.png", 1);
+  int channels = 1;
+  gsl_matrix **matrices = matrices_from_image("../res/Image_01.png", channels);
+
+  save_matrix_to_file("../res/image_01_A.mat", matrices[0]);
+  gsl_matrix* matrix = load_matrix_from_file("../res/image_01_A.mat");
+  matrices_to_image(&matrix, "../res/image_01_baw.png", channels);
+  for(int i = 0; i < channels; i++)
+	  gsl_matrix_free(matrices[i]);
+  gsl_matrix_free(matrix);
   return 0;
 }
 

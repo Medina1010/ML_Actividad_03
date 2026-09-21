@@ -1,6 +1,54 @@
 #include "gsl_wrapper.h"
 #include "image_wrapper.h"
 
+void save_matrix_to_file(char *path, gsl_matrix* matrix) {
+	FILE* f = fopen(path, "w");
+	fprintf(f, "%zu\n", matrix->size1);
+	fprintf(f, "%zu\n", matrix->size2);
+	for (int j = 0; j < matrix->size2; j++)
+	for (int i = 0; i < matrix->size2; i++)
+		fprintf(f, "%f\n", gsl_matrix_get(matrix, i, j));
+	fclose(f);
+}
+
+void save_vector_to_file(char *path, gsl_vector* vector) {
+	FILE* f = fopen(path, "w");
+	fprintf(f, "%zu\n", vector->size);
+	for (int i = 0; i < vector->size; i++)
+		fprintf(f, "%f\n", gsl_vector_get(vector, i));
+	fclose(f);
+}
+
+gsl_matrix* load_matrix_from_file(char *path) {
+	FILE* f = fopen(path, "r");
+	size_t size1, size2;
+	fscanf(f, "%zu\n", &size1);
+	fscanf(f, "%zu\n", &size2);
+	gsl_matrix* matrix = gsl_matrix_alloc(size1, size2);
+	float value;
+	for (int j = 0; j < matrix->size2; j++)
+	for (int i = 0; i < matrix->size2; i++) {
+		fscanf(f, "%f\n", &value);
+		gsl_matrix_set(matrix, i, j, value);
+	}
+	fclose(f);
+	return matrix;
+}
+
+gsl_vector* load_vector_from_file(char *path) {
+	FILE* f = fopen(path, "r");
+	size_t size;
+	fscanf(f, "%zu\n", &size);
+	gsl_vector* vector = gsl_vector_alloc(size);
+	float value;
+	for (int i = 0; i < vector->size; i++) {
+		fscanf(f, "%f\n", &value);
+		gsl_vector_set(vector, i, value);
+	}
+	fclose(f);
+	return vector;
+}
+
 gsl_matrix **matrices_from_image(char *path, int channels) {
   stbi_image image;
   stbi_load_simple(path, &image, channels);
