@@ -11,6 +11,7 @@
 void svd_svc_image(char *input_path, char *output_path, int channels);
 void svd_and_save(char *input_path, int channels);
 void svd_compose(char *input_path, int channels);
+void analysis_vector(gsl_vector* vector);
 
 int main(void) {
   setvbuf(stdout, NULL, _IONBF, 0);
@@ -26,16 +27,126 @@ int main(void) {
   //svd_and_save("../res/Image_03", channels);
   //svd_and_save("../res/Image_04", channels);
   //svd_and_save("../res/Image_05", channels);
-  svd_and_save("../res/Image_06", channels);
+  //svd_and_save("../res/Image_06", channels);
   
   //svd_compose("../res/Image_01", channels);
   //svd_compose("../res/Image_02", channels);
   //svd_compose("../res/Image_03", channels);
   //svd_compose("../res/Image_04", channels);
   //svd_compose("../res/Image_05", channels);
-  svd_compose("../res/Image_06", channels);
+  //svd_compose("../res/Image_06", channels);
+  
+
+  //gsl_vector* S = load_vector_from_file("../res/Image_01_S_c0_3.dat");
+  //analysis_vector(S);
+  //gsl_vector_free(S);
 
   return 0;
+}
+
+#include <gsl/gsl_fit.h>
+
+// Función para calcular la Suma Total de Cuadrados (TSS) de un array
+double compute_tss(const double *y, size_t n) {
+    double sum = 0.0;
+    for (size_t i = 0; i < n; i++) {
+        sum += y[i];
+    }
+    double mean = sum / n;
+
+    double tss = 0.0;
+    for (size_t i = 0; i < n; i++) {
+        double diff = y[i] - mean;
+        tss += diff * diff;
+    }
+    return tss;
+}
+
+// Estructura para almacenar resultados del ajuste
+typedef struct {
+    double c0;       // Intercepto (o log de A)
+    double c1;       // Pendiente B
+    double sum_sq;   // Suma de los residuos al cuadrado
+    double R2;       // Coeficiente de determinación R^2
+} FitResult;
+
+// Ajuste Lineal: y = c0 + c1 * x
+FitResult fit_linear(const double *x, const double *y, size_t n) {
+    FitResult res;
+    double cov00, cov01, cov11;
+    
+    gsl_fit_linear(x, 1, y, 1, n, &res.c0, &res.c1, &cov00, &cov01, &cov11, &res.sum_sq);
+    
+    double tss = compute_tss(y, n);
+    res.R2 = 1.0 - (res.sum_sq / tss);
+    return res;
+}
+
+// Ajuste Exponencial: y = A * exp(B * x)  =>  ln(y) = ln(A) + B * x
+FitResult fit_exponential(const double *x, const double *y, size_t n) {
+    double y_log[n];
+    for (size_t i = 0; i < n; i++) {
+        y_log[i] = log(y[i]);
+    }
+    
+    FitResult res;
+    double cov00, cov01, cov11;
+    
+    gsl_fit_linear(x, 1, y_log, 1, n, &res.c0, &res.c1, &cov00, &cov01, &cov11, &res.sum_sq);
+    
+    double tss = compute_tss(y_log, n);
+    res.R2 = 1.0 - (res.sum_sq / tss);
+    return res; // A = exp(res.c0), B = res.c1
+}
+
+// Ajuste Algebraico (Potencia): y = A * x^B  =>  ln(y) = ln(A) + B * ln(x)
+FitResult fit_algebraic(const double *x, const double *y, size_t n) {
+    double x_log[n], y_log[n];
+    for (size_t i = 0; i < n; i++) {
+        x_log[i] = log(x[i]);
+        y_log[i] = log(y[i]);
+    }
+    
+    FitResult res;
+    double cov00, cov01, cov11;
+    
+    gsl_fit_linear(x_log, 1, y_log, 1, n, &res.c0, &res.c1, &cov00, &cov01, &cov11, &res.sum_sq);
+    
+    double tss = compute_tss(y_log, n);
+    res.R2 = 1.0 - (res.sum_sq / tss);
+    return res; // A = exp(res.c0), B = res.c1
+}
+
+void analysis_vector(gsl_vector* vector) {
+    // Ejemplo de datos en vectores gsl_vector
+    size_t n = vector->size;
+    gsl_vector *v_x = gsl_vector_alloc(n);
+
+
+    for (size_t i = 0; i < n; i++) {
+        gsl_vector_set(v_x, i, i+1);
+    }
+
+    // Punteros a los arrays continuos subyacentes de gsl_vector
+    double *x = gsl_vector_ptr(v_x, 0);
+    double *y = gsl_vector_ptr(vector, 0);
+
+    // Cálculo de los coeficientes
+    FitResult res_lin = fit_linear(x, y, n);
+    FitResult res_exp = fit_exponential(x, y, n);
+    FitResult res_alg = fit_algebraic(x, y, n);
+
+    // Impresión de resultados
+    printf("--- Coeficientes R^2 ---\n");
+    printf("Modelo Lineal:      R^2 = %.6f\n", res_lin.R2);
+    printf("Modelo Exponencial: R^2 = %.6f  (y = %.4f * e^(%.4f * x))\n", 
+           res_exp.R2, exp(res_exp.c0), res_exp.c1);
+    printf("Modelo Algebraico:  R^2 = %.6f  (y = %.4f * x^(%.4f))\n", 
+           res_alg.R2, exp(res_alg.c0), res_alg.c1);
+
+    // Limpieza de memoria
+    gsl_vector_free(v_x);
+
 }
 
 void svd_and_save(char *input_path, int channels) {
