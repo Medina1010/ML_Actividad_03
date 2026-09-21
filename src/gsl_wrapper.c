@@ -6,7 +6,7 @@ void save_matrix_to_file(char *path, gsl_matrix* matrix) {
 	fprintf(f, "%zu\n", matrix->size1);
 	fprintf(f, "%zu\n", matrix->size2);
 	for (int j = 0; j < matrix->size2; j++)
-	for (int i = 0; i < matrix->size2; i++)
+	for (int i = 0; i < matrix->size1; i++)
 		fprintf(f, "%f\n", gsl_matrix_get(matrix, i, j));
 	fclose(f);
 }
@@ -27,7 +27,7 @@ gsl_matrix* load_matrix_from_file(char *path) {
 	gsl_matrix* matrix = gsl_matrix_alloc(size1, size2);
 	float value;
 	for (int j = 0; j < matrix->size2; j++)
-	for (int i = 0; i < matrix->size2; i++) {
+	for (int i = 0; i < matrix->size1; i++) {
 		fscanf(f, "%f\n", &value);
 		gsl_matrix_set(matrix, i, j, value);
 	}
@@ -68,13 +68,14 @@ gsl_matrix **matrices_from_image(char *path, int channels) {
 
 
 void matrices_to_image(gsl_matrix **matrices, char *path, int channels) {
-  unsigned char image_bytes[(*matrices)->size1*(*matrices)->size2*channels];
+  unsigned char *image_bytes = malloc((*matrices)->size1*(*matrices)->size2*channels);
   for (int j = 0; j < (*matrices)->size2; j++)
     for (int i = 0; i < (*matrices)->size1; i++)
       for (int c = 0; c < channels; c++)
         image_bytes[channels * (i + j * (*matrices)->size1) + c] = gsl_matrix_get(matrices[c], i, j);
   stbi_write_png(path, (*matrices)->size1, (*matrices)->size2, channels, image_bytes,
                  (*matrices)->size1 * channels);
+  free(image_bytes);
 }
 
 void print_matrix(const gsl_matrix *A) {
