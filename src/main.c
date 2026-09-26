@@ -2,16 +2,17 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+#define BLD_IMPLEMENTATION
 
 #include "gsl_wrapper.h"
 #include "image_wrapper.h"
-
-#define LOG(MSG) printf("[LOG]: " MSG "\n")
+#include "bld.h"
 
 void svd_svc_image(char *input_path, char *output_path, int channels);
 void svd_and_save(char *input_path, int channels);
 void svd_compose(char *input_path, int channels);
 void analysis_vector(gsl_vector* vector);
+void analysis_and_graph(const char* file_wno_extension, float percent);
 
 int main(void) {
   setvbuf(stdout, NULL, _IONBF, 0);
@@ -37,11 +38,25 @@ int main(void) {
   //svd_compose("../res/Image_06", channels);
   
 
-  //gsl_vector* S = load_vector_from_file("../res/Image_01_S_c0_3.dat");
-  //analysis_vector(S);
-  //gsl_vector_free(S);
+  analysis_and_graph("../res/Image_01_S_c0_3", 0.9);
 
   return 0;
+}
+
+void analysis_and_graph(const char* file_wno_extension, float percent) {
+  char input[128];
+  char output[128];
+  sprintf(input, "%s.dat", file_wno_extension);
+  sprintf(output, "%s_curve.png", file_wno_extension);
+
+  gsl_vector* S = load_vector_from_file(input);
+  gsl_vector_view v_truncated = gsl_vector_subvector(S, S->size * (1 - percent), S->size * percent);
+  analysis_vector(&v_truncated.vector);
+  gsl_vector_free(S);
+
+  char command[512];
+  sprintf(command, "gnuplot -e \"infile='%s'; outfile='%s'; pct=%f\" plot.gp", input, output, percent);
+  cmd(command);
 }
 
 #include <gsl/gsl_fit.h>
