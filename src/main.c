@@ -17,6 +17,8 @@ void analysis_and_graph(const char* file_wno_extension, float percent);
 int main(void) {
   setvbuf(stdout, NULL, _IONBF, 0);
   int channels = 3;
+  //svd_and_save("../res/gatico", channels);
+
   //svd_and_save("../res/Image_01", channels);
   //svd_and_save("../res/Image_02", channels);
   //svd_and_save("../res/Image_03", channels);
@@ -30,9 +32,13 @@ int main(void) {
   //svd_compose("../res/Image_04", channels);
   //svd_compose("../res/Image_05", channels);
   //svd_compose("../res/Image_06", channels);
+
+  svd_compose("../res/gatico", channels);
   
 
-  analysis_and_graph("../res/Image_01_S_c0_3", 0.9);
+  //analysis_and_graph("../res/Image_01_S_c0_3", 0.9);
+  analysis_and_graph("../res/Image_03_S_c0_3", 0.9);
+  analysis_and_graph("../res/Image_04_S_c0_3", 0.9);
 
   return 0;
 }
@@ -221,7 +227,7 @@ void svd_compose(char *input_path, int channels) {
     double sv_sum = 0;
     int index;
     for (int j = 0; j < (*S)->size; j++) {
-      if (sv_sum > sv_total * 0.2f) {
+      if (sv_sum > sv_total * 0.95f) {
         gsl_vector_set(S[i], j, 0);
       }
       if (gsl_vector_get(S[i], j) != 0) {
