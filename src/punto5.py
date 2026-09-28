@@ -1,31 +1,33 @@
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+import seaborn as sns
 
 
-df = pd.read_excel("../res/sol_objects.csv")#, engine="odf")
+df = pd.read_excel('Machine.xlsx',  sheet_name = 'Hoja 1')
 
-
-X = df[[
-        "semimajorAxis",
-            "eccentricity",
-                "meanRadius",
-                    "mass_kg",
-                        "orbit_type"
-                        ]]
-
-
-X = X.fillna(X.median(numeric_only=True))
+features = ['Edad','Estatura','Nota Electro','Hermanos','Peso']
+X =df.iloc[:21][features]
 
 scaler = StandardScaler()
-X_std = scaler.fit_transform(X)
+X_scaled =  scaler.fit_transform(X)
 
 pca = PCA()
-X_pca = pca.fit_transform(X_std)
+X_pca = pca.fit_transform(X_scaled)
+
+for i  in range(len(X_pca)):
+  plt.annotate(str(i), (X_pca[i,0] + 0.05 , X_pca[i,1]+ 0.05))
+
+plt.scatter(X_pca[:,0], X_pca[:,1], color='purple')
+plt.xlabel("Componente principal 1")
+plt.ylabel("Componente principal 2")
+plt.title("Análisis de componentes principales")
+plt.grid(True)
 
 
-print("Varianza explicada:")
-print(pca.explained_variance_ratio_)
-
-print("\nVarianza acumulada:")
-print(pca.explained_variance_ratio_.cumsum())
+plt.figure(figsize=(10,6))
+sns.heatmap(X.corr(), annot= True , cmap= 'coolwarm')
+plt.title("Matriz de correlación")
+plt.show()
