@@ -16,12 +16,6 @@ void analysis_and_graph(const char* file_wno_extension, float percent);
 
 int main(void) {
   setvbuf(stdout, NULL, _IONBF, 0);
-  //svd_svc_image("../res/Image_01.png", "../res/Image_01_feo.png", 1);
-  //svd_svc_image("../res/Image_02.png", "../res/Image_02_feo.png", 1);
-  //svd_svc_image("../res/Image_03.png", "../res/Image_03_feo.png", 1);
-  //svd_svc_image("../res/Image_04.png", "../res/Image_04_feo.png", 1);
-  //svd_svc_image("../res/Image_05.png", "../res/Image_05_feo.png", 1);
-  //svd_svc_image("../res/Image_06.png", "../res/Image_06_feo.png", 1);
   int channels = 3;
   //svd_and_save("../res/Image_01", channels);
   //svd_and_save("../res/Image_02", channels);
